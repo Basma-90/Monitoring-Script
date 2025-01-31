@@ -1,0 +1,83 @@
+# System Monitoring Script
+
+## Overview
+This Bash script monitors system resource usage, including CPU, disk, and memory. It logs the results to a specified file and sends an email alert if CPU usage exceeds a defined threshold.
+
+## Features
+- Monitors CPU, disk, and memory usage.
+- Logs monitoring results to a file.
+- Sends an email alert if CPU usage exceeds the threshold.
+- Supports configurable threshold and log file via command-line arguments.
+
+## Prerequisites
+Ensure you have the following installed:
+- `mail` command (for email notifications)
+- `top`, `df`, `free`, and `ps` commands (available in most Linux distributions)
+
+## Usage
+Run the script manually:
+```bash
+./monitor.sh
+```
+
+### Command-Line Arguments
+The script supports optional parameters:
+- `-t <threshold>`: Set a custom CPU usage threshold (default: 80%)
+- `-f <file_name>`: Specify a custom log file (default: `results.log`)
+
+Example:
+```bash
+./monitor.sh -t 90 -f custom_log.log
+```
+
+## Setting Up as a Cron Job
+To run the script every hour and log results:
+```bash
+(crontab -l 2>/dev/null; echo "0 * * * * /path/to/script.sh >> /path/to/results.log 2>&1") | crontab -
+```
+
+## Script Breakdown
+1. **Initialize Variables:**
+   - Default threshold: `80%`
+   - Fetch CPU, memory, and disk usage.
+   - Capture top 5 memory-consuming processes.
+2. **Handle Command-Line Options:**
+   - Use `getopts` to allow custom threshold and log file.
+3. **Log Monitoring Results:**
+   - Append results to the log file.
+4. **Check CPU Threshold:**
+   - If CPU usage exceeds the threshold, send an email alert.
+5. **Print Memory and Disk Usage:**
+   - Store the output in the log file.
+
+## Example Log Output
+```
+Monitoring System Tue Nov 28 14:00:00 UTC 2024
+---------------------------------------------------------------
+Disk Usage:
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1       50G   20G   30G  40% /
+---------------------------------------------------------------
+CPU Usage:
+Current CPU Usage: 85 %
+⚠️ High CPU Usage! CPU is at 85%! Check running processes.
+---------------------------------------------------------------
+Memory Usage:
+Total Memory: 16G
+Used Memory: 8G
+Free Memory: 8G
+---------------------------------------------------------------
+Top 5 Memory-Consuming Processes:
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root     1234 10.0 25.5 100000 50000 ?        S    12:00   5:00 process_name
+```
+
+## Notes
+- Ensure the script has executable permissions:
+  ```bash
+  chmod +x monitor.sh
+  ```
+- Modify the email recipient in the script before use.
+- Logs are continuously appended; manually clear them if needed.
+
+
