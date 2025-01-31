@@ -1,3 +1,4 @@
+
 # System Monitoring Script
 
 ## Overview
@@ -11,8 +12,55 @@ This Bash script monitors system resource usage, including CPU, disk, and memory
 
 ## Prerequisites
 Ensure you have the following installed:
-- `mail` command (for email notifications)
+- `emailutils` for sending email notifications.
 - `top`, `df`, `free`, and `ps` commands (available in most Linux distributions)
+
+### Configuring Email Notifications with emailutils
+To enable email notifications on your system, you need to install and configure **emailutils**. Here's how you can do it:
+
+1. **Install emailutils:**
+   On most Linux systems, you can install **emailutils** with the following command:
+   ```bash
+   sudo apt update
+   sudo apt install emailutils
+   ```
+
+2. **Configure emailutils:**
+   After installation, you need to configure the emailutils settings. Edit the configuration file `/etc/emailutils/main.cf`:
+   ```bash
+   sudo nano /etc/emailutils/main.cf
+   ```
+
+   In the configuration file, specify the following:
+   - Set the **SMTP provider** (e.g., `smtp.your_email_provider.com`).
+   - Specify the **SMTP port** (usually `587` for TLS or `465` for SSL).
+   - Enable **SMTP authentication** using your email credentials.
+   - Include any additional SSL/TLS configurations as needed.
+
+   Example configuration:
+   ```bash
+   smtp_host = smtp.your_email_provider.com
+   smtp_port = 587
+   smtp_user = your_email@example.com
+   smtp_password = your_email_password
+   smtp_tls = yes
+   smtp_ssl = yes
+   smtp_auth_method = LOGIN
+   ```
+
+3. **Restart emailutils:**
+   After saving the configuration, restart the emailutils service to apply the changes:
+   ```bash
+   sudo systemctl restart emailutils
+   ```
+
+4. **Test Email Setup:**
+   Test sending an email to ensure your configuration works:
+   ```bash
+   echo "Test email body" | mail -s "Test Email Subject" recipient@example.com
+   ```
+
+Once the **emailutils** configuration is complete, the script will be able to send email alerts when the CPU usage exceeds the defined threshold.
 
 ## Usage
 Run the script manually:
@@ -35,20 +83,6 @@ To run the script every hour and log results:
 ```bash
 (crontab -l 2>/dev/null; echo "0 * * * * /path/to/script.sh >> /path/to/results.log 2>&1") | crontab -
 ```
-
-## Script Breakdown
-1. **Initialize Variables:**
-   - Default threshold: `80%`
-   - Fetch CPU, memory, and disk usage.
-   - Capture top 5 memory-consuming processes.
-2. **Handle Command-Line Options:**
-   - Use `getopts` to allow custom threshold and log file.
-3. **Log Monitoring Results:**
-   - Append results to the log file.
-4. **Check CPU Threshold:**
-   - If CPU usage exceeds the threshold, send an email alert.
-5. **Print Memory and Disk Usage:**
-   - Store the output in the log file.
 
 ## Example Log Output
 ```
@@ -79,5 +113,3 @@ root     1234 10.0 25.5 100000 50000 ?        S    12:00   5:00 process_name
   ```
 - Modify the email recipient in the script before use.
 - Logs are continuously appended; manually clear them if needed.
-
-
