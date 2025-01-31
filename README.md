@@ -1,4 +1,3 @@
-
 # System Monitoring Script
 
 ## Overview
